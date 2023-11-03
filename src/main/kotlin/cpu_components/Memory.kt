@@ -1,11 +1,11 @@
 package cpu_components
 
-class Memory(override val size: Int = MEMORY_SIZE) : ArrayList<String>(size) {
+class Memory(override val size: Int = MEMORY_SIZE) : ArrayList<String>(size){
     init {
         reset()
     }
 
-    private fun reset() {
+   fun reset() {
         repeat(MEMORY_SIZE) {
             this.add("0x0000")
         }

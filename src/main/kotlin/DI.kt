@@ -1,9 +1,10 @@
-import execute_components.CompilerImpl
+import execute_components.Compiler
 import cpu_components.*
+import execute_components.Executor
 
 fun provideCPU(memory: Memory): CPU {
     return CPU(
-        provideSP(memory.size),
+        provideSP(memory),
         provideALU(),
         provideFlags(memory),
         providePC(),
@@ -11,13 +12,15 @@ fun provideCPU(memory: Memory): CPU {
     )
 }
 
-fun provideCompiler(path: String): execute_components.Compiler = CompilerImpl(path)
+fun provideExecutor(): Executor = Executor()
 
-fun provideMemory() = Memory()
+fun provideCompiler(path: String) = Compiler(path)
 
-fun provideSP(size: Int) = SP(size)
+fun provideMemory(): Memory = Memory()
 
-fun provideALU() = ALU()
+fun provideSP(memory: Memory) = SP(memory)
+
+fun provideALU(): ALU = ALU()
 
 fun provideFlags(memory: Memory) = Flags(memory)
 

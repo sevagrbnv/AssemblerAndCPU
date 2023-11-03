@@ -17,7 +17,7 @@ class Flags(private val memory: Memory) : HashMap<String, Boolean>() {
         this["ZF"] = gpr["A"] == 0
         this["SF"] = gpr["A"]!! < 0
         this["0F"] = gpr["A"]!! > 32767
-        this["JSPE"] = sp.seek() == memory.size - 1
+        this["SPE"] = sp.seek() == memory.size - 1
     }
 
     fun reset() {
@@ -25,6 +25,6 @@ class Flags(private val memory: Memory) : HashMap<String, Boolean>() {
         this["ZF"] = true // Нуль
         this["SF"] = false // Знак, по умолчанию "+"
         this["OF"] = false // Переполнение
-        this["JSPE"] = true // stack is empty
+        this["SPE"] = true // stack is empty
     }
 }

@@ -15,6 +15,6 @@ class GPR : HashMap<String, Int>() {
     }
 
     override fun toString(): String {
-        return "General Purpose Register:\n${super<java.util.HashMap>.toString()}"
+        return "General Purpose Register:\n${super.toString()}"
     }
 }

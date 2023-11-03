@@ -1,5 +1,3 @@
-import execute_components.Executor
-
 // 84
 // 101 0100
 // безадресные команды
@@ -7,9 +5,7 @@ import execute_components.Executor
 // сумма элементов
 
 fun main() {
-    Executor().also {
+    provideExecutor().also {
         it.run()
     }
 }
-
-fun String.hexToInt() = this.substring(2).toInt(radix = 16)

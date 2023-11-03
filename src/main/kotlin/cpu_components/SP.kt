@@ -4,9 +4,9 @@ import exceptions.EmptyStackEx
 import exceptions.StackOverflowEx
 
 // stack pointer
-class SP(private val size: Int) {
+class SP(private val memory: Memory){
 
-    private var value = size - 1
+    private var value = memory.size - 1
 
     fun seek() = value
 
@@ -17,9 +17,13 @@ class SP(private val size: Int) {
     }
 
     fun pop(): Int {
-        if (value >= size)
+        if (value >= memory.size - 1)
             throw EmptyStackEx()
         return ++value
+    }
+
+    fun reset() {
+        value = memory.size
     }
 
     override fun toString(): String {

@@ -1,9 +1,11 @@
 package execute_components
 
-import hexToInt
 import provideCPU
 import provideCompiler
 import provideMemory
+import utils.hexToCommand
+import utils.hexToInt
+import utils.toHexFormat
 import java.nio.file.FileSystems
 
 class Executor {
@@ -14,91 +16,73 @@ class Executor {
 
     fun run() {
         val compiler = provideCompiler(PATH)
-        val tactCounter = TactCounter()
 
         val compiledProgram = compiler.run()
         compiledProgram.forEachIndexed { index, string ->
             memory[index] = string
         }
 
-        state = State.READ_COMMAND
+        state = State.RUN
         while (state != State.WAIT) {
-            state = if (tactCounter.get() == 0) State.READ_COMMAND else State.EXECUTE_COMMAND
-            when (state) {
-                State.READ_COMMAND -> readCommand(memory)
-                State.EXECUTE_COMMAND -> executeCommand(memory)
-                else -> throw IllegalStateException()
-            }
+            val command = memory[cpu.pc.value]
+            executeCommand(command)
             cpu.pc.next()
-            tactCounter.next()
             cpu.flags.refresh(cpu.gpr, cpu.sp)
-            monitor()
+            printState()
             readLine()
         }
     }
 
-    private fun readCommand(program: MutableList<String>) {
-        println(program[cpu.pc.value])
-        when (program[cpu.pc.value]) {
-            /*
-                PUSH -> 0x0000
-                POP -> 0x0001
-                ADD -> 0x0002
-                SPE -> 0x0003 // stack is empty
-                HLT -> 0x000A
-                RST -> 0x000B
-            */
-
+    private fun executeCommand(command: String) {
+        println(command.hexToCommand())
+        when (command) {
             "0x0000" -> { // PUSH
-                memory[cpu.sp.add()] = program[cpu.pc.seekNext()]
+                cpu.pc.next()
+                memory[cpu.sp.add()] = memory[cpu.pc.value]
             }
             "0x0001" -> { // POP
-                memory[cpu.sp.pop()] = "0x00"
+                memory[cpu.sp.pop()] = "0x0000"
             }
             "0x0002" -> { // ADD
                 val a = cpu.sp.pop()
+                memory[cpu.sp.seek()] = 0.toHexFormat()
                 cpu.gpr["A"]?.let { cpu.alu.setA(it) }
                 cpu.alu.setB(memory[a].hexToInt())
+                cpu.alu.calc()
+                cpu.gpr["A"] = cpu.alu.getRes()
             }
-            "0x0003" -> { // JSPE - stack is empty
-                if (cpu.flags["JSPE"] == true) {
-                    cpu.pc.value = memory[cpu.pc.seekNext()].hexToInt() + JUMP_SHIFT
-                }
+            "0x0003" -> { // SPE - stack is empty
+                cpu.pc.next()
+                print(memory[cpu.pc.value])
+                if (cpu.flags["SPE"] == true)
+                    cpu.pc.value = memory[cpu.pc.value].hexToInt() + JUMP_SHIFT
             }
-            "0x0004" -> { // JSNPE - stack is not empty
-                if (cpu.flags["JSPE"] == false) {
-                    cpu.pc.value = memory[cpu.pc.seekNext()].hexToInt() + JUMP_SHIFT
-                }
+            "0x0004" -> { // SNPE - stack is not empty
+                cpu.pc.next()
+                print(memory[cpu.pc.value])
+                if (cpu.flags["SPE"] == false)
+                    cpu.pc.value = memory[cpu.pc.value].hexToInt() + JUMP_SHIFT
+            }
+            "0x0006" -> { // ACC
+                cpu.pc.next()
+                cpu.gpr["A"] = memory[cpu.sp.pop()].toInt()
             }
             "0x000A" -> { // HLT
                 state = State.WAIT
             }
-
-            else -> {}
-        }
-
-    }
-
-    private fun executeCommand(program: MutableList<String>) {
-        when (program[cpu.pc.value - 1]) {
-            /*
-                PUSH -> 0x0000
-                ADD -> 0x0001
-                POP -> 0x0002
-                SPE -> 0x0003
-                HLT -> 0x1010
-                RST -> 0x1011
-            */
-
-            "0x0002" -> { // ADD
-                cpu.alu.calc()
-                println(cpu.alu.getRes())
-                cpu.gpr["A"] = cpu.alu.getRes()
+            "0x000B" -> { // RST
+                memory.reset()
+                cpu.alu.reset()
+                cpu.gpr.reset()
+                cpu.pc.reset()
+                cpu.sp.reset()
+                cpu.flags.reset()
             }
         }
+
     }
 
-    fun monitor() {
+    fun printState() {
         println(cpu.gpr)
         println()
         println(memory.toString())
@@ -109,7 +93,7 @@ class Executor {
     }
 
     companion object {
-        const val JUMP_SHIFT = -3
+        const val JUMP_SHIFT = -2
 
         val PATH = "${getRootDirectory()}\\src\\main\\kotlin\\program"
         fun getRootDirectory() = FileSystems.getDefault().getPath("").toAbsolutePath()

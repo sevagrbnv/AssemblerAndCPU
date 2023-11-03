@@ -18,4 +18,10 @@ class ALU {
     fun calc() {
         res = a + b
     }
+
+    fun reset() {
+        a = 0
+        b = 0
+        res = 0
+    }
 }
