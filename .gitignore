@@ -25,7 +25,8 @@ hs_err_pid*
 
 /shelf/
 /workspace.xml
-/out
-/.idea
+out/
+.idea/
 proc_lab.iml
+.gitignore
 
