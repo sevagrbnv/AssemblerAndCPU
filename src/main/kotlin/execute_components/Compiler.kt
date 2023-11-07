@@ -5,13 +5,10 @@ import utils.toHexFormat
 import java.nio.file.Files
 import java.nio.file.Paths
 
-class Compiler(path: String) {
+class Compiler {
 
-    private val program: List<String> by lazy {
-        Files.readAllLines(Paths.get(path))
-    }
-
-    fun run(): MutableList<String> {
+    fun run(sourceCode: String): MutableList<String> {
+        val program = Files.readAllLines(Paths.get(sourceCode))
         val compiledProgram = mutableListOf<String>()
         program.forEach { command ->
             val code = commandToCode(command)

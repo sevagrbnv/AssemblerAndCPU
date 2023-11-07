@@ -1,12 +1,10 @@
 package execute_components
 
 import provideCPU
-import provideCompiler
 import provideMemory
 import utils.hexToCommand
 import utils.hexToInt
 import utils.toHexFormat
-import java.nio.file.FileSystems
 
 class Executor {
 
@@ -14,14 +12,10 @@ class Executor {
     private val memory = provideMemory()
     private val cpu = provideCPU(memory)
 
-    fun run() {
-        val compiler = provideCompiler(PATH)
-
-        val compiledProgram = compiler.run()
+    fun run(compiledProgram: MutableList<String>) {
         compiledProgram.forEachIndexed { index, string ->
             memory[index] = string
         }
-
         state = State.RUN
         while (state != State.WAIT) {
             val command = memory[cpu.pc.value]
@@ -45,11 +39,11 @@ class Executor {
             }
             "0x0002" -> { // ADD
                 val a = cpu.sp.pop()
-                memory[cpu.sp.seek()] = 0.toHexFormat()
                 cpu.gpr["A"]?.let { cpu.alu.setA(it) }
                 cpu.alu.setB(memory[a].hexToInt())
                 cpu.alu.calc()
                 cpu.gpr["A"] = cpu.alu.getRes()
+                memory[cpu.sp.seek()] = 0.toHexFormat()
             }
             "0x0003" -> { // SPE - stack is empty
                 cpu.pc.next()
@@ -82,7 +76,7 @@ class Executor {
 
     }
 
-    fun printState() {
+    private fun printState() {
         println(cpu.gpr)
         println()
         println(memory.toString())
@@ -94,8 +88,5 @@ class Executor {
 
     companion object {
         const val JUMP_SHIFT = -2
-
-        val PATH = "${getRootDirectory()}\\src\\main\\kotlin\\program"
-        fun getRootDirectory() = FileSystems.getDefault().getPath("").toAbsolutePath()
     }
 }

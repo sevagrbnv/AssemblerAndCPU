@@ -14,7 +14,7 @@ fun provideCPU(memory: Memory): CPU {
 
 fun provideExecutor(): Executor = Executor()
 
-fun provideCompiler(path: String) = Compiler(path)
+fun provideCompiler() = Compiler()
 
 fun provideMemory(): Memory = Memory()
 
