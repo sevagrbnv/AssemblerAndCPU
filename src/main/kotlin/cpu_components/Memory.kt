@@ -1,20 +1,24 @@
 package cpu_components
 
-class Memory(override val size: Int = MEMORY_SIZE) : ArrayList<String>(size){
+import utils.toHexFormat
+
+class Memory(override val size: Int = MEMORY_SIZE) : ArrayList<Int>(size){
     init {
         reset()
     }
 
    fun reset() {
         repeat(MEMORY_SIZE) {
-            this.add("0x0000")
+            this.add(0)
         }
     }
 
     override fun toString(): String {
         val result = StringBuilder()
-        this.chunked(CHUNK_SIZE).forEach {
-            result.appendLine(it.joinToString(" "))
+        this.chunked(CHUNK_SIZE).forEach { chunk ->
+            result.appendLine(chunk.joinToString(" ") { item ->
+                item.toHexFormat()
+            })
         }
         return "Memory:\n${result}"
     }

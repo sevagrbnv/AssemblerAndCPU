@@ -2,15 +2,13 @@ import execute_components.Compiler
 import cpu_components.*
 import execute_components.Executor
 
-fun provideCPU(memory: Memory): CPU {
-    return CPU(
-        provideSP(memory),
-        provideALU(),
-        provideFlags(memory),
-        providePC(),
-        provideGPR()
-    )
-}
+fun provideCPU(memory: Memory): CPU = CPU(
+    provideSP(memory),
+    provideALU(),
+    provideFlags(memory),
+    providePC(),
+    provideGPR()
+)
 
 fun provideExecutor(): Executor = Executor()
 

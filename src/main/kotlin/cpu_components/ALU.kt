@@ -15,8 +15,12 @@ class ALU {
 
     fun getRes() = res
 
-    fun calc() {
+    fun add() {
         res = a + b
+    }
+
+    fun cmp() {
+        res = a - b
     }
 
     fun reset() {

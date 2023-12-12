@@ -12,11 +12,11 @@ class Flags(private val memory: Memory) : HashMap<String, Boolean>() {
         reset()
     }
 
-    fun refresh(gpr: GPR, sp: SP) {
-        this["PF"] = gpr["A"]?.rem(2) == 0
-        this["ZF"] = gpr["A"] == 0
-        this["SF"] = gpr["A"]!! < 0
-        this["0F"] = gpr["A"]!! > 32767
+    fun refresh(alu: ALU, sp: SP) {
+        this["PF"] = alu.getRes().rem(2) == 0
+        this["ZF"] = alu.getRes() == 0
+        this["SF"] = alu.getRes() < 0
+        this["0F"] = alu.getRes() > 32767
         this["SPE"] = sp.seek() == memory.size - 1
     }
 

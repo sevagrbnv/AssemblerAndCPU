@@ -6,20 +6,20 @@ import exceptions.StackOverflowEx
 // stack pointer
 class SP(private val memory: Memory){
 
-    private var value = memory.size - 1
+    private var value = memory.size
 
     fun seek() = value
 
     fun add(): Int {
-        if (value == -1)
+        if (value == memory.size - 9)
             throw StackOverflowEx()
-        return value--
+        return --value
     }
 
     fun pop(): Int {
-        if (value >= memory.size - 1)
+        if (value > memory.size)
             throw EmptyStackEx()
-        return ++value
+        return value++
     }
 
     fun reset() {
